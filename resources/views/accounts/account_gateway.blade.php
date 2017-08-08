@@ -32,6 +32,10 @@
                     {{ Former::populateField($accountGateway->gateway_id.'_'.$field, $config->$field) }}
                 @endif
             @endforeach
+
+            @if ($accountGateway->gateway_id == GATEWAY_HEARTLAND && isset($config->publicApiKey))
+                {{ Former::populateField(GATEWAY_HEARTLAND . '_publicApiKey', $config->publicApiKey) }}
+            @endif
         @endif
     @else
         {!! Former::populateField('show_address', 1) !!}
@@ -71,6 +75,10 @@
                     {!! Former::populateField($gateway->id.'_'.$field, $details) !!}
                 @endif
 
+                @if ($gateway->id == GATEWAY_HEARTLAND && ($field != 'secretApiKey'))
+                    @continue
+                @endif
+
                 @if (in_array($field, $hiddenFields))
                     {{-- do nothing --}}
                 @elseif ($gateway->id == GATEWAY_DWOLLA && ($field == 'key' || $field == 'secret')
@@ -108,6 +116,8 @@
                            ->text(trans('texts.braintree_enable_paypal'))
                            ->value(1) !!}
                 @endif
+            @elseif ($gateway->id == GATEWAY_HEARTLAND)
+                {!! Former::text($gateway->id . '_publicApiKey')->label('Public Api Key') !!}
             @endif
 
             @if ($gateway->getHelp())

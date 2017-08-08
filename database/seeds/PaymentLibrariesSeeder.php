@@ -72,6 +72,7 @@ class PaymentLibrariesSeeder extends Seeder
             ['name' => 'Braintree', 'provider' => 'Braintree', 'sort_order' => 2],
             ['name' => 'Custom', 'provider' => 'Custom', 'is_offsite' => true, 'sort_order' => 8],
             ['name' => 'FirstData Payeezy', 'provider' => 'FirstData_Payeezy'],
+            ['name' => 'Heartland', 'provider' => 'Heartland'],
         ];
 
         foreach ($gateways as $gateway) {
