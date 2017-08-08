@@ -24,7 +24,7 @@
                 return true;
             });
 
-            @if ($accountGateway->gateway_id != GATEWAY_BRAINTREE)
+            @if ($accountGateway->gateway_id != GATEWAY_BRAINTREE && $accountGateway->gateway_id != GATEWAY_HEARTLAND)
                 var card = new Card({
                     form: 'form#payment-form', // *required*
                     container: '.card-wrapper', // *required*
@@ -206,7 +206,7 @@
         {{--- do nothing ---}}
     @else
         <div class="row">
-            <div class="col-lg-{{ ($accountGateway->gateway_id == GATEWAY_BRAINTREE) ? 12 : 8 }}">
+            <div class="col-lg-{{ ($accountGateway->gateway_id == GATEWAY_BRAINTREE || $accountGateway->gateway_id == GATEWAY_HEARTLAND) ? 12 : 8 }}">
 
                 <h3>
                     {{ trans('texts.billing_method') }}
@@ -223,6 +223,8 @@
                     <div class="col-md-12">
                         @if ($accountGateway->gateway_id == GATEWAY_BRAINTREE)
                             <div id="card_number" class="braintree-hosted form-control"></div>
+                        @elseif ($accountGateway->gateway_id == GATEWAY_HEARTLAND)
+                            <div id="card_number" class="heartland-hosted form-control"></div>
                         @else
                             {!! Former::text(!empty($tokenize) ? '' : 'card_number')
                                     ->id('card_number')
@@ -233,9 +235,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-{{ ($accountGateway->gateway_id == GATEWAY_HEARTLAND) ? 6 : 5 }}">
                         @if ($accountGateway->gateway_id == GATEWAY_BRAINTREE)
                             <div id="expiration_month" class="braintree-hosted form-control"></div>
+                        @elseif ($accountGateway->gateway_id == GATEWAY_HEARTLAND)
+                            <div id="expiration" class="heartland-hosted form-control"></div>
                         @else
                             {!! Former::select(!empty($tokenize) ? '' : 'expiration_month')
                                     ->id('expiration_month')
@@ -256,26 +260,30 @@
                                     !!}
                         @endif
                     </div>
-                    <div class="col-md-4">
-                        @if ($accountGateway->gateway_id == GATEWAY_BRAINTREE)
-                            <div id="expiration_year" class="braintree-hosted form-control"></div>
-                        @else
-                            {!! Former::select(!empty($tokenize) ? '' : 'expiration_year')
-                                    ->id('expiration_year')
-                                    ->autocomplete('cc-exp-year')
-                                    ->placeholder(trans('texts.expiration_year'))
-                                    ->options(
-                                        array_combine(
-                                            range(date('Y'), date('Y') + 10),
-                                            range(date('Y'), date('Y') + 10)
+                    @if ($accountGateway->gateway_id != GATEWAY_HEARTLAND)
+                        <div class="col-md-4">
+                            @if ($accountGateway->gateway_id == GATEWAY_BRAINTREE)
+                                <div id="expiration_year" class="braintree-hosted form-control"></div>
+                            @else
+                                {!! Former::select(!empty($tokenize) ? '' : 'expiration_year')
+                                        ->id('expiration_year')
+                                        ->autocomplete('cc-exp-year')
+                                        ->placeholder(trans('texts.expiration_year'))
+                                        ->options(
+                                            array_combine(
+                                                range(date('Y'), date('Y') + 10),
+                                                range(date('Y'), date('Y') + 10)
+                                            )
                                         )
-                                    )
-                                    ->label('') !!}
-                        @endif
-                    </div>
-                    <div class="col-md-3">
+                                        ->label('') !!}
+                            @endif
+                        </div>
+                    @endif
+                    <div class="col-md-{{ ($accountGateway->gateway_id == GATEWAY_HEARTLAND) ? 6 : 3 }}">
                         @if ($accountGateway->gateway_id == GATEWAY_BRAINTREE)
                             <div id="cvv" class="braintree-hosted form-control"></div>
+                        @elseif ($accountGateway->gateway_id == GATEWAY_HEARTLAND)
+                            <div id="cvv" class="heartland-hosted form-control"></div>
                         @else
                             {!! Former::text(!empty($tokenize) ? '' : 'cvv')
                                     ->id('cvv')
@@ -297,6 +305,8 @@
                                     {!! trans('texts.token_billing_secure', ['link' => link_to('https://stripe.com/', 'Stripe.com', ['target' => '_blank'])]) !!}
                                 @elseif ($storageGateway == GATEWAY_BRAINTREE)
                                     {!! trans('texts.token_billing_secure', ['link' => link_to('https://www.braintreepayments.com/', 'Braintree', ['target' => '_blank'])]) !!}
+                                @elseif ($storageGateway == GATEWAY_HEARTLAND)
+                                    {!! trans('texts.token_billing_secure', ['link' => link_to('https://www.heartlandpaymentsystems.com/', 'Heartland', ['target' => '_blank'])]) !!}
                                 @endif
                             </span>
                         @endif
@@ -320,7 +330,9 @@
             &nbsp;&nbsp;
         @endif
 
-        @if (isset($amount))
+        @if ($accountGateway->gateway_id == GATEWAY_HEARTLAND)
+            <div id="submit" class="btn btn-success btn-lg"></div>
+        @elseif (isset($amount))
             {!! Button::success(request()->update ? strtoupper(trans('texts.submit')) : strtoupper(trans('texts.pay_now') . ' - ' . $account->formatMoney($amount, $client, CURRENCY_DECORATOR_CODE)  ))
                             ->submit()
                             ->large() !!}

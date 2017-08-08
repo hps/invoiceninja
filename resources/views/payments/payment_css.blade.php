@@ -13,7 +13,8 @@ body {
 .container input[type=text],
 .container input[type=email],
 .container select,
-.braintree-hosted {
+.braintree-hosted,
+.heartland-hosted {
     @if(!empty($account))
         {!! $account->getBodyFontCss() !!}
     @else
