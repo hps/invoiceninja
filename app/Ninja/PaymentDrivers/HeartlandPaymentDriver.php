@@ -113,4 +113,19 @@ class HeartlandPaymentDriver extends BasePaymentDriver
 
         return $paymentMethod;
     }
+
+    public function removePaymentMethod($paymentMethod)
+    {
+        parent::removePaymentMethod($paymentMethod);
+
+        $response = $this->gateway()->deletePaymentMethod([
+            'paymentMethodReference' => $paymentMethod->source_reference,
+        ])->send();
+
+        if ($response->isSuccessful()) {
+            return true;
+        } else {
+            throw new Exception($response->getMessage());
+        }
+    }
 }
