@@ -49,7 +49,7 @@
         "gatepay/FedACHdir": "dev-master@dev",
         "google/apiclient": "^2.0",
         "guzzlehttp/guzzle": "~6.0",
-        "hps/omnipay-heartland": "dev-master",
+        "hps/omnipay-heartland": "dev-invoiceninja-improvements",
         "incube8/omnipay-multicards": "dev-master",
         "intervention/image": "dev-master",
         "jaybizzle/laravel-crawler-detect": "1.*",
