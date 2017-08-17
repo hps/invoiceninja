@@ -38,6 +38,15 @@ class HeartlandPaymentDriver extends BasePaymentDriver
         return $data;
     }
 
+    protected function checkCustomerExists($customer)
+    {
+        $response = $this->gateway()
+            ->fetchCustomer(['customerReference' => $customer->token])
+            ->send();
+
+        return $response->isSuccessful();
+    }
+
     public function createToken()
     {
         if ($customer = $this->customer() && $this->customer()->token) {
