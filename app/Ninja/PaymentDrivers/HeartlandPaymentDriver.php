@@ -49,10 +49,11 @@ class HeartlandPaymentDriver extends BasePaymentDriver
 
     public function createToken()
     {
-        if ($customer = $this->customer() && $this->customer()->token) {
+        $data = $this->paymentDetails();
+
+        if (($customer = $this->customer()) && $this->customer()->token) {
             $customerReference = $customer->token;
         } else {
-            $data = $this->paymentDetails();
             $tokenResponse = $this->gateway()->createCustomer([
                 'firstName' => array_get($this->input, 'first_name') ?: $this->contact()->first_name,
                 'lastName' => array_get($this->input, 'last_name') ?: $this->contact()->last_name,
