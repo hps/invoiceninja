@@ -118,6 +118,10 @@
                 @endif
             @elseif ($gateway->id == GATEWAY_HEARTLAND)
                 {!! Former::text($gateway->id . '_publicApiKey')->label('Public Api Key') !!}
+                {!! Former::checkbox('enable_paypal')
+                           ->label(trans('texts.paypal'))                           
+                           ->text(trans('texts.heartland_enable_paypal'))
+                           ->value(1) !!}
             @endif
 
             @if ($gateway->getHelp())
