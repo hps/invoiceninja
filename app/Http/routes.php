@@ -313,6 +313,10 @@ Route::group([
     Route::get('self-update', 'SelfUpdateController@index');
     Route::post('self-update', 'SelfUpdateController@update');
     Route::get('self-update/download', 'SelfUpdateController@download');
+	
+	//heartland
+	Route::get('heartland/create_paypal_session/{invitation_key}', 'HeartlandGatewayController@createPaypalSession');
+	Route::get('heartland/paypal_session_sale/{invitation_key}', 'HeartlandGatewayController@paypalSessionSale');
 });
 
 Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {

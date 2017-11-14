@@ -118,6 +118,27 @@
                 @endif
             @elseif ($gateway->id == GATEWAY_HEARTLAND)
                 {!! Former::text($gateway->id . '_publicApiKey')->label('Public Api Key') !!}
+                
+                <div class="heartland-paypal">
+                    {!! Former::checkbox('enable_paypal')
+                               ->id('enable_paypal')
+                               ->label(trans('texts.paypal'))                           
+                               ->text(trans('texts.heartland_enable_paypal'))
+                               ->help(trans('texts.heartland_paypal_help'))
+                               ->value(1) !!}
+
+                    <div class="heartland-paypal-options">
+                        {!! Former::checkbox('test_mode')->id('testMode')->label(ucwords(Utils::toSpaceCase('testMode')))->text('enable')->value(1) !!}
+                        <div class="heartland-paypal-testMode">
+                            {!! Former::text($gateway->id.'_username')->label(ucwords(Utils::toSpaceCase('API username'))) !!}
+                            {!! Former::text($gateway->id.'_password')->label(ucwords(Utils::toSpaceCase('API password'))) !!}
+                            {!! Former::text($gateway->id.'_siteId')->label(ucwords(Utils::toSpaceCase('siteId'))) !!}
+                            {!! Former::text($gateway->id.'_deviceId')->label(ucwords(Utils::toSpaceCase('deviceId'))) !!}
+                            {!! Former::text($gateway->id.'_licenseId')->label(ucwords(Utils::toSpaceCase('licenseId'))) !!}
+                            {!! Former::text($gateway->id.'_serviceUri')->label(ucwords(Utils::toSpaceCase('serviceUri'))) !!}
+                        </div>
+                    </div>
+                </div>
             @endif
 
             @if ($gateway->getHelp())
@@ -189,6 +210,7 @@
                         ->label(trans('texts.ach'))
                         ->text(trans('texts.enable_ach'))
                         ->value(1) !!}
+        
     @endif
 
     </div>
@@ -255,6 +277,17 @@
         var visible = $('#enable_ach').is(':checked');
         $('.stripe-ach-options').toggle(visible);
     }
+    
+    function enableHeartlandPaypalSettings() {
+        var visible = $('.heartland-paypal #enable_paypal').is(':checked');
+        $('.heartland-paypal-options').toggle(visible);
+        enableHeartlandPaypalTestMode();
+    }
+    
+    function enableHeartlandPaypalTestMode() {
+        var visible = $('.heartland-paypal #testMode').is(':checked');
+        $('.heartland-paypal-testMode').toggle(visible);
+    }
 
     var gateways = {!! Cache::get('gateways') !!};
 
@@ -262,11 +295,14 @@
 
         setFieldsShown();
         enablePlaidSettings();
+        enableHeartlandPaypalSettings();        
 
         $('#show_address').change(enableUpdateAddress);
         enableUpdateAddress();
 
-        $('#enable_ach').change(enablePlaidSettings)
+        $('#enable_ach').change(enablePlaidSettings);
+        $('.heartland-paypal #enable_paypal').change(enableHeartlandPaypalSettings); 
+        $('.heartland-paypal #testMode').change(enableHeartlandPaypalTestMode);
 
         @if (!$accountGateway && count($secondaryGateways))
             $('#primary_gateway_id').append($('<option>', {

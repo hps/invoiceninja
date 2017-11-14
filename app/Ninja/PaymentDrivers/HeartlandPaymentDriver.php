@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Ninja\PaymentDrivers;
 
 use Exception;
@@ -8,6 +7,7 @@ use App\Models\GatewayType;
 
 class HeartlandPaymentDriver extends BasePaymentDriver
 {
+
     protected $customerReferenceParam = 'customerReference';
     protected $sourceReferenceParam = 'paymentMethodReference';
     public $canRefundPayments = true;
@@ -16,8 +16,12 @@ class HeartlandPaymentDriver extends BasePaymentDriver
     {
         $types = [
             GATEWAY_TYPE_CREDIT_CARD,
-            GATEWAY_TYPE_TOKEN,
+            GATEWAY_TYPE_TOKEN
         ];
+
+        if ($this->accountGateway && $this->accountGateway->getPayPalEnabled()) {
+            $types[] = GATEWAY_TYPE_PAYPAL;
+        }
 
         return $types;
     }
@@ -31,7 +35,11 @@ class HeartlandPaymentDriver extends BasePaymentDriver
     {
         $data = parent::paymentDetails($paymentMethod);
 
-        if (! $paymentMethod && ! empty($this->input['sourceToken'])) {
+        if ($this->isGatewayType(GATEWAY_TYPE_PAYPAL, $paymentMethod)) {
+            $data['ButtonSource'] = 'InvoiceNinja_SP';
+        }
+
+        if (!$paymentMethod && !empty($this->input['sourceToken'])) {
             $data['token'] = $this->input['sourceToken'];
         }
 
@@ -55,13 +63,13 @@ class HeartlandPaymentDriver extends BasePaymentDriver
             $customerReference = $customer->token;
         } else {
             $tokenResponse = $this->gateway()->createCustomer([
-                'firstName' => array_get($this->input, 'first_name') ?: $this->contact()->first_name,
-                'lastName' => array_get($this->input, 'last_name') ?: $this->contact()->last_name,
-                'company' => $this->client()->name,
-                'country' => $this->client()->country->iso_3166_3,
-                'primaryEmail' => $this->contact()->email,
-                'phoneDay' => $this->contact()->phone,
-            ])->send();
+                    'firstName' => array_get($this->input, 'first_name') ?: $this->contact()->first_name,
+                    'lastName' => array_get($this->input, 'last_name') ?: $this->contact()->last_name,
+                    'company' => $this->client()->name,
+                    'country' => $this->client()->country->iso_3166_3,
+                    'primaryEmail' => $this->contact()->email,
+                    'phoneDay' => $this->contact()->phone,
+                ])->send();
             if ($tokenResponse->isSuccessful()) {
                 $customerReference = $tokenResponse->getCustomerReference();
             } else {
@@ -113,9 +121,7 @@ class HeartlandPaymentDriver extends BasePaymentDriver
             $paymentMethod->payment_type_id = $this->parseCardType($response->getData()['cardBrand']);
             $paymentMethod->last4 = $response->getData()['accountNumberLast4'];
             $paymentMethod->expiration = sprintf(
-                '20%d-%d-01',
-                substr($response->getData()['expirationDate'], 2, 2),
-                substr($response->getData()['expirationDate'], 0, 2)
+                '20%d-%d-01', substr($response->getData()['expirationDate'], 2, 2), substr($response->getData()['expirationDate'], 0, 2)
             );
         } else {
             return null;
@@ -129,13 +135,46 @@ class HeartlandPaymentDriver extends BasePaymentDriver
         parent::removePaymentMethod($paymentMethod);
 
         $response = $this->gateway()->deletePaymentMethod([
-            'paymentMethodReference' => $paymentMethod->source_reference,
-        ])->send();
+                'paymentMethodReference' => $paymentMethod->source_reference,
+            ])->send();
 
         if ($response->isSuccessful()) {
             return true;
         } else {
             throw new Exception($response->getMessage());
         }
+    }
+
+    public function createPaypalSession($payment, $buyer, $lineItems = array(), $shippingDetails = array())
+    {
+        $request = $this->gateway()->createPaypalSession(array(
+            'amount' => $payment['subtotal'] + $payment['shippingAmount'] + $payment['taxAmount'],
+            'buyerDetails' => $buyer,
+            'paymentDetails' => $payment,
+            'itemDetails' => $lineItems,
+            'shippingDetails' => $shippingDetails
+        ));
+        
+        $response = $request->send();   
+        $paypalSessionResponse = $response->getData();
+
+        return $paypalSessionResponse;
+    }
+    
+    public function paypalSessionSale($paypalSessionId, $payment, $buyer, $lineItems = array(), $shippingDetails = array())
+    {
+        $request = $this->gateway()->paypalSessionSale(array(
+            'paypalSessionId' => $paypalSessionId,
+            'amount' => $payment['subtotal'] + $payment['shippingAmount'] + $payment['taxAmount'],
+            'buyerDetails' => $buyer,
+            'paymentDetails' => $payment,
+            'itemDetails' => $lineItems,
+            'shippingDetails' => $shippingDetails            
+        ));
+        
+        $response = $request->send(); 
+        $respData = $response->getData();   
+
+        return $respData;
     }
 }
