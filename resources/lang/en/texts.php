@@ -2403,9 +2403,9 @@ $LANG = array(
     'currency' => 'Currency',
     
     //Heartland
-    'heartland_enable_paypal' => 'Enable PayPal payments through Heartland. PayPal works by sending customers to PayPal where they can enter their payment information.',
+    'heartland_enable_paypal' => 'Enable PayPal payments through Heartland',
     //'heartland_paypal_disabled_help' => 'The PayPal gateway is processing PayPal payments',
-    //'heartland_paypal_help' => 'You must also :link.',
+    'heartland_paypal_help' => 'PayPal works by sending customers to PayPal where they can enter their payment information.',
     //'heartland_paypal_help_link_text' => 'link PayPal to your BrainTree account',
 
 );
