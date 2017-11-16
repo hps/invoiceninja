@@ -16,8 +16,12 @@ class HeartlandPaymentDriver extends BasePaymentDriver
     {
         $types = [
             GATEWAY_TYPE_CREDIT_CARD,
-            GATEWAY_TYPE_TOKEN,
+            GATEWAY_TYPE_TOKEN
         ];
+
+        if ($this->accountGateway && $this->accountGateway->getPayPalEnabled()) {
+            $types[] = GATEWAY_TYPE_PAYPAL;
+        }
 
         return $types;
     }
@@ -31,6 +35,10 @@ class HeartlandPaymentDriver extends BasePaymentDriver
     {
         $data = parent::paymentDetails($paymentMethod);
 
+        if ($this->isGatewayType(GATEWAY_TYPE_PAYPAL, $paymentMethod)) {
+            $data['ButtonSource'] = 'InvoiceNinja_SP';
+        }
+        
         if (! $paymentMethod && ! empty($this->input['sourceToken'])) {
             $data['token'] = $this->input['sourceToken'];
         }

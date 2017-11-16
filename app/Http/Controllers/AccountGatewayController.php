@@ -310,6 +310,8 @@ class AccountGatewayController extends BaseController
 
             if ($gatewayId == GATEWAY_HEARTLAND) {
                 $config->publicApiKey = trim(Input::get(GATEWAY_HEARTLAND . '_publicApiKey'));
+                $config->enablePayPal = boolval(Input::get('enable_paypal'));
+                $config->testMode = boolval(Input::get('test_mode'));
             }
 
             $cardCount = 0;

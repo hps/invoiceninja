@@ -120,7 +120,7 @@
                 {!! Former::text($gateway->id . '_publicApiKey')->label('Public Api Key') !!}
                 
                 <div class="heartland-paypal">
-                    {!! Former::checkbox($gateway->id.'_enable_paypal')
+                    {!! Former::checkbox('enable_paypal')
                                ->id('enable_paypal')
                                ->label(trans('texts.paypal'))                           
                                ->text(trans('texts.heartland_enable_paypal'))
@@ -128,15 +128,14 @@
                                ->value(1) !!}
 
                     <div class="heartland-paypal-options">
-                        {!! Former::checkbox($gateway->id.'_testMode')->id('testMode')->label(ucwords(Utils::toSpaceCase('testMode')))->text('enable')->value(1) !!}
+                        {!! Former::checkbox('test_mode')->id('testMode')->label(ucwords(Utils::toSpaceCase('testMode')))->text('enable')->value(1) !!}
                         <div class="heartland-paypal-testMode">
+                            {!! Former::text($gateway->id.'_username')->label(ucwords(Utils::toSpaceCase('API username'))) !!}
+                            {!! Former::text($gateway->id.'_password')->label(ucwords(Utils::toSpaceCase('API password'))) !!}
                             {!! Former::text($gateway->id.'_siteId')->label(ucwords(Utils::toSpaceCase('siteId'))) !!}
                             {!! Former::text($gateway->id.'_deviceId')->label(ucwords(Utils::toSpaceCase('deviceId'))) !!}
                             {!! Former::text($gateway->id.'_licenseId')->label(ucwords(Utils::toSpaceCase('licenseId'))) !!}
-                            {!! Former::text($gateway->id.'_username')->label(ucwords(Utils::toSpaceCase('API username'))) !!}
-                            {!! Former::text($gateway->id.'_password')->label(ucwords(Utils::toSpaceCase('API password'))) !!}
                             {!! Former::text($gateway->id.'_serviceUri')->label(ucwords(Utils::toSpaceCase('serviceUri'))) !!}
-
                         </div>
                     </div>
                 </div>
