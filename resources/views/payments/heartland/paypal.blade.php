@@ -21,11 +21,11 @@
 
     <center>
         @if(isset($amount))
-            {!! Button::success(request()->update ? strtoupper(trans('texts.submit')) : strtoupper(trans('texts.pay_now') . ' - ' . $account->formatMoney($amount, $client, CURRENCY_DECORATOR_CODE)  ))
+            {!! Button::normal(request()->update ? strtoupper(trans('texts.submit')) : strtoupper(trans('texts.pay_now') . ' - ' . $account->formatMoney($amount, $client, CURRENCY_DECORATOR_CODE)  ))
                             ->withAttributes([
                                     'onclick' => 'createPaypalSession()'
                                 ])
-                            ->submit()
+                            
                             ->large() !!}
         @else
             {!! Button::success(strtoupper(trans('texts.add_paypal_account') ))
@@ -50,6 +50,10 @@
             processData: false,
             contentType: 'application/json; charset=utf-8',
             success: function (result) {
+                console.log(result);
+                alert(result);
+            },
+            error: function (result) {
                 console.log(result);
                 alert(result);
             }

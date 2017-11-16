@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Events\InvoiceInvitationWasViewed;
@@ -32,6 +31,7 @@ use View;
 
 class HeartlandGatewayController extends BaseController
 {
+
     private $invoiceRepo;
     private $paymentRepo;
     private $documentRepo;
@@ -48,34 +48,84 @@ class HeartlandGatewayController extends BaseController
 
     public function createPaypalSession($invitationKey)
     {
-        if (! $invitation = $this->invoiceRepo->findInvoiceByInvitation($invitationKey)) {
+        if (!$invitation = $this->invoiceRepo->findInvoiceByInvitation($invitationKey)) {
             return $this->returnError();
         }
 
+        
         $invoice = $invitation->invoice;
-        $client = $invoice->client;
+        $client = $invoice->client; 
         $account = $invoice->account;
         
-        print_r($invoice);die;
+        echo '<pre>';
+        $paymentDriver = $account->paymentDriver($invitation);
+/*
+ * //change settings
+        $this->gateway->setSecretApiKey(null);
+        $this->gateway->setUsername('30360021');
+        $this->gateway->setPassword('$Test1234');
+        $this->gateway->setDeviceId('90911395');
+        $this->gateway->setLicenseId('20527');
+        $this->gateway->setSiteId('20518');
+        $this->gateway->setServiceUri('https://api-uat.heartlandportico.com/paymentserver.v1/PosGatewayService.asmx?wsdl');
+*/        
+        // createPaypalSession        
+        $buyer = array(
+            'returnUrl' => 'https://developer.heartlandpaymentsystems.com',
+            'cancelUrl' => 'https://developer.heartlandpaymentsystems.com'
+        );
+
+        $payment = array(
+            'subtotal' => $invoice->amount,
+            'shippingAmount' => '0',
+            'taxAmount' => '0',
+            'paymentType' => 'Sale'
+        );
         
+        $lineItems = array();
+        $lineItem = array(
+            'number' => '1',
+            'quantity' => '1',
+            'name' => 'Name with special',
+            'description' => 'Description with special',
+            'amount' => '20.00'
+        );
+        $lineItems[] = $lineItem;
+        
+        $shippingDetails = array(
+            'name' => 'Joe Tester',
+            'address' => '1 heartland way',
+            'city' => 'Jeffersonville',
+            'state' => 'IN',
+            'zip' => '47130',
+            'country' => 'US',
+        );
 
-        if (request()->silent) {
-            session(['silent:' . $client->id => true]);
-            return redirect(request()->url());
-        }
+        $paymentDriver->createPaypalSession($payment, $buyer, $lineItems, $shippingDetails);die;
 
-        if (! $account->checkSubdomain(Request::server('HTTP_HOST'))) {
-            return response()->view('error', [
-                'error' => trans('texts.invoice_not_found'),
-            ]);
-        }
+        
+/*
+        $invoice->terms = trim($account->invoice_terms);
+        $invoice->invoice_footer = trim($account->invoice_footer);
 
-        $account->loadLocalizationSettings($client);
+        $contact->first_name = 'Test';
+        $contact->last_name = 'Contact';
+        $contact->email = 'contact@gmail.com';
+        $client->contacts = [$contact];
 
-        if (! Input::has('phantomjs')) {
-            $this->invoiceRepo->clearGatewayFee($invoice);
-        }
+        $invoiceItem->cost = 100;
+        $invoiceItem->qty = 1;
+        $invoiceItem->notes = 'Notes';
+        $invoiceItem->product_key = 'Item';
+ 
+ */
+        die;
+
 
     }
 
+    public function paypalSessionSale()
+    {
+        
     }
+}

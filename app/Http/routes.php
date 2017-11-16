@@ -316,6 +316,7 @@ Route::group([
 	
 	//heartland
 	Route::get('heartland/create_paypal_session/{invitation_key}', 'HeartlandGatewayController@createPaypalSession');
+	Route::get('heartland/paypal_session_sale/', 'HeartlandGatewayController@paypalSessionSale');
 });
 
 Route::group(['middleware' => ['lookup:user', 'auth:user']], function () {
