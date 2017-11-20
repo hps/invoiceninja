@@ -147,9 +147,6 @@ class HeartlandPaymentDriver extends BasePaymentDriver
 
     public function createPaypalSession($payment, $buyer, $lineItems = array(), $shippingDetails = array())
     {
-        //change settings
-        $this->gateway()->setSecretApiKey(null);
-
         $request = $this->gateway()->createPaypalSession(array(
             'amount' => $payment['subtotal'] + $payment['shippingAmount'] + $payment['taxAmount'],
             'buyerDetails' => $buyer,
@@ -166,10 +163,7 @@ class HeartlandPaymentDriver extends BasePaymentDriver
     
     public function paypalSessionSale($paypalSessionId, $payment, $buyer, $lineItems = array(), $shippingDetails = array())
     {
-        //change settings
-        $this->gateway()->setSecretApiKey(null);
-
-        $request = $this->gateway->paypalSessionSale(array(
+        $request = $this->gateway()->paypalSessionSale(array(
             'paypalSessionId' => $paypalSessionId,
             'amount' => $payment['subtotal'] + $payment['shippingAmount'] + $payment['taxAmount'],
             'buyerDetails' => $buyer,
