@@ -28,6 +28,7 @@ use URL;
 use Utils;
 use Validator;
 use View;
+use stdClass;
 
 class HeartlandGatewayController extends BaseController
 {
@@ -51,6 +52,37 @@ class HeartlandGatewayController extends BaseController
      */
     public function createPaypalSession($invitationKey)
     {
+        $invoiceDetails = $this->getInvoiceDetails($invitationKey);
+
+        $data = $invoiceDetails->paymentDriver->createPaypalSession(
+            $invoiceDetails->payment, $invoiceDetails->buyer, $invoiceDetails->lineItems, $invoiceDetails->shippingDetails
+        );
+        
+        return Response::json($data);
+    }
+
+    public function paypalSessionSale($invitationKey)
+    {
+        $queryString = Request::getQueryString();
+        parse_str($queryString, $parsedData);
+        if (!empty($parsedData['PayerID']) && !empty($parsedData['token'])) {
+            $invoiceDetails = $this->getInvoiceDetails($invitationKey, true, $parsedData);
+
+            $data = $invoiceDetails->paymentDriver->paypalSessionSale(
+                $parsedData['token'], $invoiceDetails->payment, $invoiceDetails->buyer, $invoiceDetails->lineItems, $invoiceDetails->shippingDetails
+            );
+            
+            return Response::json($data);
+        } else {
+            return response()->view('error', [
+                    'error' => trans('texts.invoice_not_found'),
+                    'hideHeader' => true,
+            ]);
+        }
+    }
+
+    private function getInvoiceDetails($invitationKey, $isSale = false, $paypalDetails = array())
+    {
         if (!$invitation = $this->invoiceRepo->findInvoiceByInvitation($invitationKey)) {
             return response()->view('error', [
                     'error' => trans('texts.invoice_not_found'),
@@ -62,13 +94,20 @@ class HeartlandGatewayController extends BaseController
         $client = $invoice->client;
         $account = $invoice->account;
 
-        $paymentDriver = $account->paymentDriver($invitation);
-
-        // createPaypalSession        
-        $buyer = array(
-            'returnUrl' => URL::to('/heartland/paypal_session_sale'),
-            'cancelUrl' => URL::to('/heartland/paypal_session_sale')
-        );
+        if ($isSale === true) {
+            //paypal sale
+            $buyer = array(
+                'returnUrl' => URL::to('/heartland/paypal_session_sale/' . $invitationKey),
+                'cancelUrl' => URL::to('/heartland/paypal_session_sale/' . $invitationKey),
+                'payerId' => $paypalDetails['PayerID']
+            );
+        } else {
+            // createPaypalSession        
+            $buyer = array(
+                'returnUrl' => URL::to('/heartland/paypal_session_sale/' . $invitationKey),
+                'cancelUrl' => URL::to('/heartland/paypal_session_sale/' . $invitationKey)
+            );
+        }
 
         $payment = array(
             'subtotal' => $invoice->amount,
@@ -103,13 +142,16 @@ class HeartlandGatewayController extends BaseController
             );
         }
 
-        $data = $paymentDriver->createPaypalSession($payment, $buyer, $lineItems, $shippingDetails);
+        $paymentDriver = $account->paymentDriver($invitation);
 
-        return Response::json($data);
-    }
+        //return data
+        $invoiceDetails = new stdClass();
+        $invoiceDetails->buyer = $buyer;
+        $invoiceDetails->payment = $payment;
+        $invoiceDetails->lineItems = $lineItems;
+        $invoiceDetails->shippingDetails = $shippingDetails;
+        $invoiceDetails->paymentDriver = $paymentDriver;
 
-    public function paypalSessionSale()
-    {
-        
+        return $invoiceDetails;
     }
 }

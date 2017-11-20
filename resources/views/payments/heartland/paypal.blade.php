@@ -50,8 +50,7 @@
             processData: false,
             contentType: 'application/json; charset=utf-8',
             success: function (result) {
-                console.log(result);
-                alert(result);
+                window.location.href = result.RedirectUrl;
             },
             error: function (result) {
                 console.log(result);

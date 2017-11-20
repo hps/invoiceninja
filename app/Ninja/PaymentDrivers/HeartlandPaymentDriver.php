@@ -163,4 +163,24 @@ class HeartlandPaymentDriver extends BasePaymentDriver
 
         return $paypalSessionResponse;
     }
+    
+    public function paypalSessionSale($paypalSessionId, $payment, $buyer, $lineItems = array(), $shippingDetails = array())
+    {
+        //change settings
+        $this->gateway()->setSecretApiKey(null);
+
+        $request = $this->gateway->paypalSessionSale(array(
+            'paypalSessionId' => $paypalSessionId,
+            'amount' => $payment['subtotal'] + $payment['shippingAmount'] + $payment['taxAmount'],
+            'buyerDetails' => $buyer,
+            'paymentDetails' => $payment,
+            'itemDetails' => $lineItems,
+            'shippingDetails' => $shippingDetails            
+        ));
+        
+        $response = $request->send(); 
+        $respData = $response->getData();   
+
+        return $respData;
+    }
 }
