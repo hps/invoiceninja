@@ -161,8 +161,6 @@ class HeartlandPaymentDriver extends BasePaymentDriver
         $response = $request->send();   
         $paypalSessionResponse = $response->getData();
 
-        print_r($paypalSessionResponse);
-        
         return $paypalSessionResponse;
     }
 }

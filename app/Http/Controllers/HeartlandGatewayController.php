@@ -46,33 +46,28 @@ class HeartlandGatewayController extends BaseController
         $this->creditRepo = $creditRepo;
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function createPaypalSession($invitationKey)
     {
         if (!$invitation = $this->invoiceRepo->findInvoiceByInvitation($invitationKey)) {
-            return $this->returnError();
+            return response()->view('error', [
+                    'error' => trans('texts.invoice_not_found'),
+                    'hideHeader' => true,
+            ]);
         }
 
-        
         $invoice = $invitation->invoice;
-        $client = $invoice->client; 
+        $client = $invoice->client;
         $account = $invoice->account;
-        
-        echo '<pre>';
+
         $paymentDriver = $account->paymentDriver($invitation);
-/*
- * //change settings
-        $this->gateway->setSecretApiKey(null);
-        $this->gateway->setUsername('30360021');
-        $this->gateway->setPassword('$Test1234');
-        $this->gateway->setDeviceId('90911395');
-        $this->gateway->setLicenseId('20527');
-        $this->gateway->setSiteId('20518');
-        $this->gateway->setServiceUri('https://api-uat.heartlandportico.com/paymentserver.v1/PosGatewayService.asmx?wsdl');
-*/        
+
         // createPaypalSession        
         $buyer = array(
-            'returnUrl' => 'https://developer.heartlandpaymentsystems.com',
-            'cancelUrl' => 'https://developer.heartlandpaymentsystems.com'
+            'returnUrl' => URL::to('/heartland/paypal_session_sale'),
+            'cancelUrl' => URL::to('/heartland/paypal_session_sale')
         );
 
         $payment = array(
@@ -81,47 +76,36 @@ class HeartlandGatewayController extends BaseController
             'taxAmount' => '0',
             'paymentType' => 'Sale'
         );
-        
-        $lineItems = array();
-        $lineItem = array(
-            'number' => '1',
-            'quantity' => '1',
-            'name' => 'Name with special',
-            'description' => 'Description with special',
-            'amount' => '20.00'
-        );
-        $lineItems[] = $lineItem;
-        
-        $shippingDetails = array(
-            'name' => 'Joe Tester',
-            'address' => '1 heartland way',
-            'city' => 'Jeffersonville',
-            'state' => 'IN',
-            'zip' => '47130',
-            'country' => 'US',
-        );
 
-        $paymentDriver->createPaypalSession($payment, $buyer, $lineItems, $shippingDetails);die;
+        $lineItems = $shippingDetails = array();
+        //form line items
+        if (!empty($invoice->invoice_items)) {
+            foreach ($invoice->invoice_items as $index => $item) {
+                $lineItems[] = array(
+                    'number' => $index + 1,
+                    'quantity' => intval($item->qty),
+                    'name' => intval($item->qty) . ' ' . $item->product_key,
+                    'description' => $item->notes,
+                    'amount' => $item->cost
+                );
+            }
+        }
 
-        
-/*
-        $invoice->terms = trim($account->invoice_terms);
-        $invoice->invoice_footer = trim($account->invoice_footer);
+        //form shipping details
+        if (!empty($shippingDetails)) {
+            $shippingDetails = array(
+                'name' => $client->name,
+                'address' => $client->address1,
+                'city' => $client->city,
+                'state' => 'IN', //$client->state,
+                'zip' => $client->postal_code,
+                'country' => $client->country->iso_3166_2,
+            );
+        }
 
-        $contact->first_name = 'Test';
-        $contact->last_name = 'Contact';
-        $contact->email = 'contact@gmail.com';
-        $client->contacts = [$contact];
+        $data = $paymentDriver->createPaypalSession($payment, $buyer, $lineItems, $shippingDetails);
 
-        $invoiceItem->cost = 100;
-        $invoiceItem->qty = 1;
-        $invoiceItem->notes = 'Notes';
-        $invoiceItem->product_key = 'Item';
- 
- */
-        die;
-
-
+        return Response::json($data);
     }
 
     public function paypalSessionSale()
