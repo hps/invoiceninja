@@ -15,6 +15,7 @@ class GatewayTypesSeeder extends Seeder
             ['alias' => 'bitcoin', 'name' => 'Bitcoin'],
             ['alias' => 'dwolla', 'name' => 'Dwolla'],
             ['alias' => 'custom', 'name' => 'Custom'],
+            ['alias' => 'realex', 'name' => 'Realex'],
         ];
 
         foreach ($gateway_types as $gateway_type) {

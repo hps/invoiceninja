@@ -284,6 +284,7 @@ if (! defined('APP_NAME')) {
     define('GATEWAY_BRAINTREE', 61);
     define('GATEWAY_CUSTOM', 62);
     define('GATEWAY_HEARTLAND', 64);
+    define('GATEWAY_REALEX', 65);
 
     // The customer exists, but only as a local concept
     // The remote gateway doesn't understand the concept of customers
@@ -415,6 +416,7 @@ if (! defined('APP_NAME')) {
     define('GATEWAY_TYPE_DWOLLA', 5);
     define('GATEWAY_TYPE_CUSTOM', 6);
     define('GATEWAY_TYPE_TOKEN', 'token');
+    define('GATEWAY_TYPE_REALEX', 7);
 
     define('REMINDER1', 'reminder1');
     define('REMINDER2', 'reminder2');

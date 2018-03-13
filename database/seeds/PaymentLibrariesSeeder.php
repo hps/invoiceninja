@@ -73,6 +73,7 @@ class PaymentLibrariesSeeder extends Seeder
             ['name' => 'Custom', 'provider' => 'Custom', 'is_offsite' => true, 'sort_order' => 8],
             ['name' => 'FirstData Payeezy', 'provider' => 'FirstData_Payeezy'],
             ['name' => 'Heartland', 'provider' => 'Heartland'],
+			['name' => 'Realex Hosted', 'provider' => 'Realex_Hosted', 'is_offsite' => true],
         ];
 
         foreach ($gateways as $gateway) {
