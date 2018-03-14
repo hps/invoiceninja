@@ -39,7 +39,7 @@
         "descubraomundo/omnipay-pagarme": "dev-master",
         "digitickets/omnipay-barclays-epdq": "~3.0",
         "digitickets/omnipay-datacash": "~3.0",
-        "digitickets/omnipay-realex": "~5.0",
+        "digitickets/omnipay-realex": "dev-realex-APM",
         "dioscouri/omnipay-cybersource": "dev-master",
         "doctrine/dbal": "2.5.x",
         "ezyang/htmlpurifier": "~v4.7",
@@ -164,6 +164,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/hillelcoren/l5-google-cloud-storage"
+        },
+		{
+            "type": "vcs",
+            "url": "https://github.com/slogsdon/omnipay-realex"
         }
     ]
 }
