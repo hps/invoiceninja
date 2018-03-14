@@ -21,6 +21,26 @@ class RealexHostedPaymentDriver extends BasePaymentDriver
         return $types;
     }
 
+    protected function paymentDetails($paymentMethod = false)
+    {
+        $data = parent::paymentDetails($paymentMethod);
+
+        $country = ($this->client() && $this->client()->country) ?
+            $this->client()->country->iso_3166_2 :
+            ($this->account()->country ? $this->account()->country->iso_3166_2 : false);
+
+        $data['transactionId'] = uniqid() . '-' . $data['transactionId'];
+        $data['hppCustomerCountry'] = $country;
+        $data['hppCustomerFirstName'] = $data['card']->getBillingFirstName();
+        $data['hppCustomerLastName'] = $data['card']->getBillingLastName();
+        $data['merchantResponseUrl'] = $data['returnUrl'];
+        $data['hppTxstatusUrl'] = $data['returnUrl'];
+        $data['hppVersion'] = 2;
+        $data['testMode'] = true;
+
+        return $data;
+    }
+
     protected function creatingPayment($payment, $paymentMethod)
     {
         $payment->payer_id = $this->input['guid'];
@@ -35,24 +55,5 @@ class RealexHostedPaymentDriver extends BasePaymentDriver
         } else {
             throw new Exception('Invalid Realex transaction');
         }
-    }
-
-    protected function paymentDetails($paymentMethod = false)
-    {
-        $data = parent::paymentDetails($paymentMethod);
-
-        echo '<pre> in realex';
-
-        $data['hppCustomerCountry'] = 'US';
-        $data['hppCustomerFirstName'] = 'James';
-        $data['hppCustomerLastName'] = 'Mason';
-        $data['merchantResponseUrl'] = $data['returnUrl'];
-        $data['hppTxstatusUrl'] = $data['cancelUrl'];
-        $data['hppVersion'] = 2;
-        $data['comment1'] = 2;
-        $data['comment2'] = 2;
-        $data['testMode'] = true;
-
-        return $data;
     }
 }
