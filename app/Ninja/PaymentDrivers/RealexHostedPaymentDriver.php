@@ -15,15 +15,21 @@ class RealexHostedPaymentDriver extends BasePaymentDriver
     public function gatewayTypes()
     {
         $types = [
-            GATEWAY_TYPE_REALEX
+            GATEWAY_TYPE_REALEX,
+            //GATEWAY_TYPE_CREDIT_CARD
         ];
-
+        //$this->accountGateway->gateway->provider = strtolower('Realex_Remote');
         return $types;
     }
-
+    
+    
     protected function paymentDetails($paymentMethod = false)
-    {
+    {        
         $data = parent::paymentDetails($paymentMethod);
+        
+        if (!$this->isGatewayType(GATEWAY_TYPE_REALEX)) {
+            return $data;
+        }
 
         $country = ($this->client() && $this->client()->country) ?
             $this->client()->country->iso_3166_2 :
@@ -35,8 +41,9 @@ class RealexHostedPaymentDriver extends BasePaymentDriver
         $data['hppCustomerLastName'] = $data['card']->getBillingLastName();
         $data['merchantResponseUrl'] = $data['returnUrl'];
         $data['hppTxstatusUrl'] = $data['returnUrl'];
-        $data['hppVersion'] = 2;
-        $data['testMode'] = true;
+        $data['comment1'] = 'Invoice Id: ' . $data['transactionId'];
+        
+        //echo '<pre>';print_r($this->accountGateway->getConfig());die;
 
         return $data;
     }
