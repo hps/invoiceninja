@@ -15,10 +15,19 @@ class RealexRemotePaymentDriver extends BasePaymentDriver
     public function gatewayTypes()
     {
         $types = [
-            GATEWAY_TYPE_REALEX,
-            GATEWAY_TYPE_CREDIT_CARD
+            GATEWAY_TYPE_CREDIT_CARD,
+            GATEWAY_TYPE_REALEX
         ];
-              
+
+        /*
+        $gateway = $this->accountGateway; print_r($gateway);die;
+
+        if ($gateway && $gateway->getEnableHppApm()) {
+            $types[] = GATEWAY_TYPE_REALEX;
+        }
+         * *
+         */
+
         return $types;
     }
 
@@ -27,7 +36,7 @@ class RealexRemotePaymentDriver extends BasePaymentDriver
         $data = parent::paymentDetails($paymentMethod);
 
         $data['transactionId'] = uniqid() . '-' . $data['transactionId'];
-        
+
         if (!$this->isGatewayType(GATEWAY_TYPE_REALEX)) {
             return $data;
         }
@@ -43,12 +52,13 @@ class RealexRemotePaymentDriver extends BasePaymentDriver
         $data['hppTxstatusUrl'] = $data['returnUrl'];
         $data['comment1'] = 'Invoice Id: ' . $data['transactionId'];
 
-        //echo '<pre>';print_r($this->accountGateway->getConfig());die;
+
 
         return $data;
     }
-    
-    public function startPurchase($input = false, $sourceId = false){
+
+    public function startPurchase($input = false, $sourceId = false)
+    {
         if ($this->isGatewayType(GATEWAY_TYPE_REALEX)) {
             $this->accountGateway->gateway->provider = 'Realex_Hosted';
             $this->accountGateway->gateway->is_offsite = 1;

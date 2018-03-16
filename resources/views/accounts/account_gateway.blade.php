@@ -84,7 +84,7 @@
                 @elseif ($gateway->id == GATEWAY_DWOLLA && ($field == 'key' || $field == 'secret')
                     && isset($_ENV['DWOLLA_KEY']) && isset($_ENV['DWOLLA_SECRET']))
                     {{-- do nothing --}}
-                @elseif ($field == 'testMode' || $field == 'developerMode' || $field == 'sandbox')
+                @elseif ($field == 'testMode' || $field == 'developerMode' || $field == 'sandbox' || $field == 'enableHppApm')
                     {!! Former::checkbox($gateway->id.'_'.$field)->label(ucwords(Utils::toSpaceCase($field)))->text('enable')->value(1) !!}
                 @elseif ($field == 'username' || $field == 'password')
                     {!! Former::text($gateway->id.'_'.$field)->label('API '. ucfirst(Utils::toSpaceCase($field))) !!}
