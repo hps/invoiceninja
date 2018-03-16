@@ -2401,7 +2401,7 @@ $LANG = array(
     'contact_custom1' => 'Contact First Custom',
     'contact_custom2' => 'Contact Second Custom',
     'currency' => 'Currency',
-	'realex' => 'Realex',
+	'realex' => 'Realex HPP',
 
 );
 
