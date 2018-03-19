@@ -218,4 +218,12 @@ class AccountGateway extends EntityModel
 
         return \URL::to(env('WEBHOOK_PREFIX', '').'payment_hook/'.$account->account_key.'/'.$this->gateway_id.env('WEBHOOK_SUFFIX', ''));
     }
+    
+    /**
+     * @return bool
+     */
+    public function getHppApmEnabled()
+    {
+        return ! empty($this->getConfigField('enableHppapm'));
+    }
 }

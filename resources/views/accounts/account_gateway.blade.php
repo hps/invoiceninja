@@ -23,7 +23,7 @@
         {!! Former::populateField('plaid_client_id', $accountGateway->getPlaidClientId() ? str_repeat('*', strlen($accountGateway->getPlaidClientId())) : '') !!}
         {!! Former::populateField('plaid_secret', $accountGateway->getPlaidSecret() ? str_repeat('*', strlen($accountGateway->getPlaidSecret())) : '') !!}
         {!! Former::populateField('plaid_public_key', $accountGateway->getPlaidPublicKey() ? str_repeat('*', strlen($accountGateway->getPlaidPublicKey())) : '') !!}
-
+        
         @if ($config)
             @foreach ($accountGateway->fields as $field => $junk)
                 @if (in_array($field, $hiddenFields))
@@ -84,7 +84,7 @@
                 @elseif ($gateway->id == GATEWAY_DWOLLA && ($field == 'key' || $field == 'secret')
                     && isset($_ENV['DWOLLA_KEY']) && isset($_ENV['DWOLLA_SECRET']))
                     {{-- do nothing --}}
-                @elseif ($field == 'testMode' || $field == 'developerMode' || $field == 'sandbox' || $field == 'enableHppApm')
+                @elseif ($field == 'testMode' || $field == 'developerMode' || $field == 'sandbox' || $field == 'enableHppapm')
                     {!! Former::checkbox($gateway->id.'_'.$field)->label(ucwords(Utils::toSpaceCase($field)))->text('enable')->value(1) !!}
                 @elseif ($field == 'username' || $field == 'password')
                     {!! Former::text($gateway->id.'_'.$field)->label('API '. ucfirst(Utils::toSpaceCase($field))) !!}
@@ -117,7 +117,7 @@
                            ->value(1) !!}
                 @endif
             @elseif ($gateway->id == GATEWAY_HEARTLAND)
-                {!! Former::text($gateway->id . '_publicApiKey')->label('Public Api Key') !!}
+                {!! Former::text($gateway->id . '_publicApiKey')->label('Public Api Key') !!}  
             @endif
 
             @if ($gateway->getHelp())

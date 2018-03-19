@@ -311,6 +311,10 @@ class AccountGatewayController extends BaseController
             if ($gatewayId == GATEWAY_HEARTLAND) {
                 $config->publicApiKey = trim(Input::get(GATEWAY_HEARTLAND . '_publicApiKey'));
             }
+            
+            if ($gatewayId == GATEWAY_REALEX) {
+                $config->enableHppapm = boolval(Input::get(GATEWAY_REALEX.'_enableHppapm'));
+            }
 
             $cardCount = 0;
             if ($creditcards) {

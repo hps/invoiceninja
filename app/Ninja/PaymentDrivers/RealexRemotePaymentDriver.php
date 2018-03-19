@@ -15,18 +15,12 @@ class RealexRemotePaymentDriver extends BasePaymentDriver
     public function gatewayTypes()
     {
         $types = [
-            GATEWAY_TYPE_CREDIT_CARD,
-            GATEWAY_TYPE_REALEX
+            GATEWAY_TYPE_CREDIT_CARD
         ];
 
-        /*
-        $gateway = $this->accountGateway; print_r($gateway);die;
-
-        if ($gateway && $gateway->getEnableHppApm()) {
+        if ($this->accountGateway && $this->accountGateway->getHppApmEnabled()) {
             $types[] = GATEWAY_TYPE_REALEX;
         }
-         * *
-         */
 
         return $types;
     }
