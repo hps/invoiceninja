@@ -313,7 +313,7 @@ class AccountGatewayController extends BaseController
             }
             
             if ($gatewayId == GATEWAY_REALEX) {
-                $config->enableHppapm = boolval(Input::get(GATEWAY_REALEX.'_enableHppapm'));
+                $config->enableHppApm = boolval(Input::get(GATEWAY_REALEX.'_enableHppApm'));
             }
 
             $cardCount = 0;

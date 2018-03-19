@@ -224,6 +224,6 @@ class AccountGateway extends EntityModel
      */
     public function getHppApmEnabled()
     {
-        return ! empty($this->getConfigField('enableHppapm'));
+        return ! empty($this->getConfigField('enableHppApm'));
     }
 }
