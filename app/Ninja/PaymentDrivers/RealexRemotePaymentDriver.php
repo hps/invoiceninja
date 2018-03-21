@@ -62,8 +62,8 @@ class RealexRemotePaymentDriver extends BasePaymentDriver
 
     protected function creatingPayment($payment, $paymentMethod)
     {
-        if ($this->isGatewayType(GATEWAY_TYPE_REALEX)) {
-            $payment->payer_id = $this->input['guid'];
+        if ($this->isGatewayType(GATEWAY_TYPE_REALEX) && !empty($this->input['pasref'])) {
+            $payment->payer_id = $this->input['pasref'];
         }
 
         return $payment;
@@ -72,8 +72,8 @@ class RealexRemotePaymentDriver extends BasePaymentDriver
     public function completeOffsitePurchase($input)
     {
         if ($this->isGatewayType(GATEWAY_TYPE_REALEX)) {
-            if (!empty($input['guid'])) {
-                return $this->createPayment($input['guid']);
+            if (!empty($input['pasref'])) {
+                return $this->createPayment($input['pasref']);
             } else {
                 throw new Exception('Invalid Realex transaction');
             }
